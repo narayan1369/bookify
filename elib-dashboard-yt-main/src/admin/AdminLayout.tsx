@@ -1,4 +1,4 @@
-import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import useTokenStore from "@/store";
@@ -12,28 +12,29 @@ import {
 } from "lucide-react";
 
 const AdminLayout = () => {
-  const navigate = useNavigate();
-
   const token = useTokenStore((state) => state.token);
   const user = useTokenStore((state) => state.user);
   const setAuth = useTokenStore((state) => state.setAuth);
+
+  /* ================= AUTH GUARDS ================= */
 
   // 🔒 Not logged in
   if (!token || !user) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  // 🔒 Not admin
+  // 🔒 Logged in but not admin
   if (user.role !== "admin") {
     return <Navigate to="/dashboard/home" replace />;
   }
 
-  // ✅ LOGOUT HANDLER
+  /* ================= LOGOUT ================= */
   const handleLogout = () => {
-    setAuth(null, null); // clear token + user
-    navigate("/auth/login", { replace: true });
+    setAuth(undefined as any, undefined as any); // ✅ build-safe clear
+    window.location.href = "/auth/login"; // hard redirect = clean state
   };
 
+  /* ================= NAV STYLE ================= */
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-2 rounded-md px-3 py-2 text-sm transition ${
       isActive
@@ -43,7 +44,7 @@ const AdminLayout = () => {
 
   return (
     <div className="grid min-h-screen grid-cols-[240px_1fr]">
-      {/* SIDEBAR */}
+      {/* ================= SIDEBAR ================= */}
       <aside className="border-r bg-muted/40 p-4 flex flex-col">
         <Card>
           <CardHeader>
@@ -54,7 +55,7 @@ const AdminLayout = () => {
           </CardHeader>
         </Card>
 
-        {/* NAVIGATION */}
+        {/* ================= NAV ================= */}
         <nav className="mt-6 space-y-1 flex-1">
           <NavLink to="/admin/dashboard" className={navClass}>
             <LayoutDashboard className="h-4 w-4" />
@@ -71,14 +72,13 @@ const AdminLayout = () => {
             Books
           </NavLink>
 
-          {/* 📩 BOOK REQUESTS */}
           <NavLink to="/admin/book-requests" className={navClass}>
             <MailQuestion className="h-4 w-4" />
             Book Requests
           </NavLink>
         </nav>
 
-        {/* LOGOUT */}
+        {/* ================= LOGOUT ================= */}
         <Button
           variant="destructive"
           className="mt-4 flex items-center gap-2"
@@ -89,7 +89,7 @@ const AdminLayout = () => {
         </Button>
       </aside>
 
-      {/* MAIN */}
+      {/* ================= MAIN ================= */}
       <main className="p-6">
         <Outlet />
       </main>

@@ -15,10 +15,10 @@ import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 const LoginPage = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // ✅ FIXED
   const setAuth = useTokenStore((s) => s.setAuth);
 
   const emailRef = useRef<HTMLInputElement>(null);
@@ -29,20 +29,18 @@ const LoginPage = () => {
     onSuccess: (res) => {
       const { accessToken, user } = res.data;
 
-      console.log("LOGIN SUCCESS:", user);
-
-      // ✅ SAVE TOKEN + USER
+      // ✅ save token + user
       setAuth(accessToken, user);
 
-      // ✅ FORCE REDIRECT (NO CONFUSION)
-      if (user.role === "admin") {
-        window.location.href = "/admin/dashboard";
+      // ✅ safe navigation (NO window.location)
+      if (user?.role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
       } else {
-        window.location.href = "/dashboard/home";
+        navigate("/dashboard/home", { replace: true });
       }
     },
-    onError: (err) => {
-      console.error("LOGIN ERROR", err);
+    onError: (error: AxiosError<any>) => {
+      console.error("LOGIN ERROR", error?.response?.data || error.message);
     },
   });
 
@@ -62,33 +60,44 @@ const LoginPage = () => {
           <CardTitle>Login</CardTitle>
           <CardDescription>
             {mutation.isError && (
-              <span className="text-red-500">
-                {(mutation.error as AxiosError)?.message}
+              <span className="text-red-500 text-sm">
+                {(mutation.error as AxiosError<any>)?.response?.data?.message ||
+                  "Invalid email or password"}
               </span>
             )}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-3">
-          <div>
+          <div className="space-y-1">
             <Label>Email</Label>
-            <Input ref={emailRef} />
+            <Input ref={emailRef} type="email" placeholder="you@example.com" />
           </div>
-          <div>
+
+          <div className="space-y-1">
             <Label>Password</Label>
             <Input ref={passwordRef} type="password" />
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-3">
-          <Button onClick={submit} disabled={mutation.isPending}>
+          <Button
+            className="w-full"
+            onClick={submit}
+            disabled={mutation.isPending}
+          >
             {mutation.isPending && (
               <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
             )}
             Login
           </Button>
 
-          <Link to="/auth/register">Create account</Link>
+          <Link
+            to="/auth/register"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Create account
+          </Link>
         </CardFooter>
       </Card>
     </section>

@@ -1,111 +1,116 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { register } from '@/http/api';
-import useTokenStore from '@/store';
-import { useMutation } from '@tanstack/react-query';
-import { LoaderCircle } from 'lucide-react';
-import { useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AxiosError } from 'axios';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { register } from "@/http/api";
+import useTokenStore from "@/store";
+import { useMutation } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
+import { useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 
 const RegisterPage = () => {
-    const setToken = useTokenStore((state) => state.setToken);
+  const navigate = useNavigate();
+  const setAuth = useTokenStore((state) => state.setAuth);
 
-    const navigate = useNavigate();
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
-    const nameRef = useRef<HTMLInputElement>(null);
-    const emailRef = useRef<HTMLInputElement>(null);
-    const passwordRef = useRef<HTMLInputElement>(null);
+  const mutation = useMutation({
+    mutationFn: register,
+    onSuccess: (res) => {
+      const { accessToken } = res.data;
 
-    const mutation = useMutation({
-        mutationFn: register,
-        onSuccess: (response) => {
-            console.log('Registration successful');
-            setToken(response.data.accessToken);
-            navigate('/dashboard/home');
-        },
-        onError: (error) => {
-            console.error('Registration error:', error);
-        },
-    });
+      // ✅ Save token (user will be fetched after login)
+      setAuth(accessToken, null as any);
 
-    const handleRegisterSubmit = () => {
-        const email = emailRef.current?.value;
-        const password = passwordRef.current?.value;
-        const name = nameRef.current?.value;
+      navigate("/dashboard/home", { replace: true });
+    },
+    onError: (error) => {
+      console.error("Registration error", error);
+    },
+  });
 
-        if (!name || !email || !password) {
-            return alert('Please enter email and password');
-        }
+  const handleRegisterSubmit = () => {
+    const name = nameRef.current?.value;
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
 
-        mutation.mutate({ name, email, password });
-    };
-    return (
-        <section className="flex justify-center items-center h-screen">
-            <Card className="w-full max-w-sm">
-                <CardHeader>
-                    <CardTitle className="text-xl">Sign Up</CardTitle>
-                    <CardDescription>Enter your information to create an account</CardDescription>
-                    {mutation.isError && (
-                        <span className="text-red-500 text-sm">
-                            {(() => {
-                                const error = mutation.error as AxiosError<{ message: string }>;
-                                if (error?.response?.data?.message) {
-                                    return error.response.data.message;
-                                }
-                                if (error?.code === 'ECONNREFUSED' || error?.code === 'ERR_NETWORK') {
-                                    return 'Cannot connect to server. Please check if the backend is running.';
-                                }
-                                if (error?.message) {
-                                    return error.message;
-                                }
-                                return 'Something went wrong';
-                            })()}
-                        </span>
-                    )}
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
-                            <Input ref={nameRef} id="name" placeholder="Max" required />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                ref={emailRef}
-                                id="email"
-                                type="email"
-                                placeholder="m@example.com"
-                                required
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input ref={passwordRef} id="password" type="password" />
-                        </div>
+    if (!name || !email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
 
-                        <Button
-                            onClick={handleRegisterSubmit}
-                            className="w-full"
-                            disabled={mutation.isPending}>
-                            {mutation.isPending && <LoaderCircle className="animate-spin" />}
+    mutation.mutate({ name, email, password });
+  };
 
-                            <span className="ml-2">Create an account</span>
-                        </Button>
-                    </div>
-                    <div className="mt-4 text-center text-sm">
-                        Already have an account?{' '}
-                        <Link to={'/auth/login'} className="underline">
-                            Sign in
-                        </Link>
-                    </div>
-                </CardContent>
-            </Card>
-        </section>
-    );
+  return (
+    <section className="flex h-screen items-center justify-center">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Sign Up</CardTitle>
+          <CardDescription>
+            Create a new account
+            {mutation.isError && (
+              <p className="mt-2 text-sm text-red-500">
+                {(() => {
+                  const err = mutation.error as AxiosError<any>;
+                  return (
+                    err?.response?.data?.message ||
+                    err.message ||
+                    "Something went wrong"
+                  );
+                })()}
+              </p>
+            )}
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          <div>
+            <Label>Name</Label>
+            <Input ref={nameRef} placeholder="Your name" />
+          </div>
+
+          <div>
+            <Label>Email</Label>
+            <Input ref={emailRef} type="email" placeholder="you@example.com" />
+          </div>
+
+          <div>
+            <Label>Password</Label>
+            <Input ref={passwordRef} type="password" />
+          </div>
+
+          <Button
+            onClick={handleRegisterSubmit}
+            disabled={mutation.isPending}
+            className="w-full"
+          >
+            {mutation.isPending && (
+              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Create account
+          </Button>
+
+          <p className="text-center text-sm">
+            Already have an account?{" "}
+            <Link to="/auth/login" className="underline">
+              Login
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </section>
+  );
 };
 
 export default RegisterPage;

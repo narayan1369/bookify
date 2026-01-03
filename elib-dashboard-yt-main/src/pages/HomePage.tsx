@@ -1,7 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, Mail, Facebook, Instagram, X, Phone, CheckCircle, Star, CircleUser } from "lucide-react"; 
+import { 
+  Heart, 
+  MapPin, 
+  Mail, 
+  Facebook, 
+  Instagram, 
+  X, 
+  Phone, 
+  CheckCircle, 
+  Star, 
+  CircleUser 
+} from "lucide-react"; 
 import RequestBookPage from "./RequestBookPage";
 import axios from "axios";
 
@@ -15,7 +26,7 @@ const HomePage = () => {
   const [recommendedBooks, setRecommendedBooks] = useState<any[]>([]);
 
   // 🎧 AUDIO BOOKS STATE
-  const [audioBooks, setSetAudioBooks] = useState<any[]>([]);
+  const [audioBooks, setAudioBooks] = useState<any[]>([]);
 
   // 🔊 AUDIO PLAYER STATE
   const [openAudioPlayer, setOpenAudioPlayer] = useState(false);
@@ -68,7 +79,7 @@ const HomePage = () => {
         const audioOnly = res.data.filter(
           (b: any) => b.bookType === "audio"
         );
-        setSetAudioBooks(audioOnly);
+        setAudioBooks(audioOnly);
       } catch (err) {
         console.error("Error fetching audio books", err);
       }
@@ -76,23 +87,8 @@ const HomePage = () => {
     fetchAudioBooks();
   }, []);
 
-  const handleWishlistClick = () => {
-    navigate("/dashboard/wishlist");
-  };
-
   /* ================= SCROLL TO TRENDING ================= */
   const trendingSectionRef = useRef<HTMLDivElement | null>(null);
-
-  const scrollToTrending = () => {
-    trendingSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  /* ================= CLICK LOGIC (BOOKS & AUTHORS) ================= */
-  const handleSearchNavigate = (searchTerm: string) => {
-    navigate(`/dashboard/books?search=${encodeURIComponent(searchTerm)}`);
-  };
-
-  /* ================= TRENDING AUTO SCROLL ================= */
   const sliderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -111,6 +107,11 @@ const HomePage = () => {
     const intervalId = setInterval(scroll, 30);
     return () => clearInterval(intervalId);
   }, []);
+
+  /* ================= SEARCH NAVIGATE ================= */
+  const handleSearchNavigate = (searchTerm: string) => {
+    navigate(`/dashboard/books?search=${encodeURIComponent(searchTerm)}`);
+  };
 
   return (
     <div className="w-full bg-white relative">
@@ -286,7 +287,7 @@ const HomePage = () => {
                     e.stopPropagation();
                     setCurrentAudio({
                       title: book.title,
-                      audioUrl: book.audioFile // Backend se audioFile field aana chahiye
+                      audioUrl: book.audioFile
                     });
                     setOpenAudioPlayer(true);
                   }}
@@ -399,10 +400,6 @@ const HomePage = () => {
                 <p className="text-sm">Galgotias University Plot No. 2, Sector 17A, Greater Noida, UP 203201</p>
               </div>
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-slate-400 mt-1" />
-                <p className="text-sm">Galgotias University Plot No. 2, Sector 17A, Greater Noida, UP 203201</p>
-              </div>
-              <div className="flex items-start gap-3">
                 <Mail className="h-5 w-5 text-slate-400 mt-1" />
                 <p className="text-sm">narayantiwari1369@gmail.com</p>
               </div>
@@ -423,12 +420,13 @@ const HomePage = () => {
         </div>
       </footer>
 
+      {/* ================= MODALS ================= */}
       <RequestBookPage
         open={openRequestModal}
         onClose={() => setOpenRequestModal(false)}
       />
 
-      {/* ================= CONTACT MODAL ================= */}
+      {/* CONTACT MODAL */}
       {openContactModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white rounded-[40px] w-full max-w-lg p-10 shadow-2xl relative overflow-hidden border">
@@ -453,7 +451,7 @@ const HomePage = () => {
         </div>
       )}
 
-      {/* ================= AUDIO PLAYER MODAL ================= */}
+      {/* AUDIO PLAYER MODAL */}
       {openAudioPlayer && currentAudio && (
         <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl animate-in zoom-in duration-300">

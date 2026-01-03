@@ -57,7 +57,6 @@ import {
   Heart,
   Star,
   Download,
-  Lock,
   Headphones,
 } from "lucide-react";
 
@@ -67,8 +66,8 @@ interface Book {
   title?: string;
   genre?: string;
   coverImage: string;
-  file?: string;        // 📘 PDF
-  audioFile?: string;  // 🎧 AUDIO
+  file?: string;        // PDF
+  audioFile?: string;  // AUDIO
   duration?: string;
   bookType?: "pdf" | "audio";
   authorName?: string;
@@ -91,8 +90,11 @@ const BooksPage = () => {
 
   const [search, setSearch] = useState("");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+
+  // ✅ FIX: define similarBooks properly
   const [similarBooks, setSimilarBooks] = useState<Book[]>([]);
 
+  // ✅ FIX: define unlockedBooks + setter
   const [unlockedBooks, setUnlockedBooks] = useState<string[]>(() =>
     JSON.parse(localStorage.getItem("unlockedBooks") || "[]")
   );
@@ -117,7 +119,9 @@ const BooksPage = () => {
     if (!selectedBook) return;
 
     axios
-      .get(`http://localhost:7001/api/books/${selectedBook._id}/similar`)
+      .get(
+        `${import.meta.env.VITE_PUBLIC_BACKEND_URL || "http://localhost:7001"}/api/books/${selectedBook._id}/similar`
+      )
       .then((res) => setSimilarBooks(res.data || []))
       .catch(() => setSimilarBooks([]));
   }, [selectedBook]);
@@ -154,11 +158,13 @@ const BooksPage = () => {
     },
   });
 
+  /* ================= UNLOCK CHECK ================= */
   const isUnlocked = (book: Book) =>
     !book.isPaid || unlockedBooks.includes(book._id);
 
   if (isLoading) return <p className="p-6">Loading books...</p>;
-  if (isError) return <p className="p-6 text-red-500">Failed to load books</p>;
+  if (isError)
+    return <p className="p-6 text-red-500">Failed to load books</p>;
 
   return (
     <div className="flex gap-6 p-4">
@@ -192,16 +198,16 @@ const BooksPage = () => {
                       selectedBook.file || ""
                     )}&embedded=true`}
                   />
-                  <Button
-                    variant="outline"
-                    className="mt-3"
-                    onClick={() =>
-                      window.open(selectedBook.file, "_blank")
-                    }
-                  >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Open in new tab
-                  </Button>
+                  {selectedBook.file && (
+                    <Button
+                      variant="outline"
+                      className="mt-3"
+                      onClick={() => window.open(selectedBook.file, "_blank")}
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Open in new tab
+                    </Button>
+                  )}
                 </>
               )}
             </>
@@ -210,12 +216,12 @@ const BooksPage = () => {
       </Dialog>
 
       {/* ================= SIDEBAR ================= */}
-      <aside className="w-60">
+      <aside className="w-60 shrink-0">
         <Card>
           <CardHeader>
             <CardTitle>Categories</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-1">
             {categories.map((cat) => (
               <Button
                 key={cat}
@@ -235,12 +241,14 @@ const BooksPage = () => {
       </aside>
 
       {/* ================= MAIN ================= */}
-      <div className="flex-1">
-        <div className="flex justify-between mb-4">
+      <div className="flex-1 space-y-4">
+        <div className="flex justify-between">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/dashboard/home">Home</BreadcrumbLink>
+                <BreadcrumbLink href="/dashboard/home">
+                  Home
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
@@ -252,14 +260,15 @@ const BooksPage = () => {
           {user?.role === "admin" && (
             <Link to="/admin/books/create">
               <Button>
-                <CirclePlus className="mr-2 h-4 w-4" /> Add Book
+                <CirclePlus className="mr-2 h-4 w-4" />
+                Add Book
               </Button>
             </Link>
           )}
         </div>
 
         <input
-          className="w-full mb-4 rounded border px-4 py-2"
+          className="w-full rounded border px-4 py-2"
           placeholder="Search by title or author..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
