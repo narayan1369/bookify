@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from "react";
-import axios from "axios";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -91,11 +90,8 @@ const BooksPage = () => {
   const [search, setSearch] = useState("");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
-  // ✅ FIX: define similarBooks properly
-  const [similarBooks, setSimilarBooks] = useState<Book[]>([]);
-
-  // ✅ FIX: define unlockedBooks + setter
-  const [unlockedBooks, setUnlockedBooks] = useState<string[]>(() =>
+  /* 🔓 UNLOCKED BOOKS (READ ONLY – no setter needed) */
+  const [unlockedBooks] = useState<string[]>(() =>
     JSON.parse(localStorage.getItem("unlockedBooks") || "[]")
   );
 
@@ -113,18 +109,6 @@ const BooksPage = () => {
     const searchTerm = searchParams.get("search");
     if (searchTerm) setSearch(searchTerm);
   }, [searchParams]);
-
-  /* ================= SIMILAR BOOKS ================= */
-  useEffect(() => {
-    if (!selectedBook) return;
-
-    axios
-      .get(
-        `${import.meta.env.VITE_PUBLIC_BACKEND_URL || "http://localhost:7001"}/api/books/${selectedBook._id}/similar`
-      )
-      .then((res) => setSimilarBooks(res.data || []))
-      .catch(() => setSimilarBooks([]));
-  }, [selectedBook]);
 
   /* ================= CATEGORIES ================= */
   const categories = useMemo(() => {

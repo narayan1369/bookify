@@ -33,14 +33,10 @@ import { LoaderCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-/* =========================
-   CONSTANTS
-========================= */
+/* ================= CONSTANTS ================= */
 const GENRES = ["BCA", "BA", "BBA", "Other"];
 
-/* =========================
-   ZOD SCHEMA
-========================= */
+/* ================= ZOD SCHEMA ================= */
 const formSchema = z.object({
   title: z.string().min(2),
   authorName: z.string().min(2),
@@ -52,11 +48,10 @@ const formSchema = z.object({
 
   coverImage: z.instanceof(FileList),
 
-  file: z.instanceof(FileList).optional(),       // PDF
-  audioFile: z.instanceof(FileList).optional(), // AUDIO
+  file: z.instanceof(FileList).optional(),
+  audioFile: z.instanceof(FileList).optional(),
   duration: z.string().optional(),
 
-  isPaid: z.boolean().optional(),
   price: z.string().optional(),
 });
 
@@ -77,7 +72,6 @@ const CreateBook = () => {
       customGenre: "",
       description: "",
       bookType: "pdf",
-      isPaid: false,
       price: "",
       duration: "",
     },
@@ -91,9 +85,7 @@ const CreateBook = () => {
     },
   });
 
-  /* =========================
-     SUBMIT HANDLER
-  ========================= */
+  /* ================= SUBMIT ================= */
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const finalGenre =
       values.genre === "Other"
@@ -105,12 +97,12 @@ const CreateBook = () => {
       return;
     }
 
-    if (values.bookType === "pdf" && !values.file?.length) {
+    if (bookType === "pdf" && !values.file?.length) {
       alert("PDF file is required");
       return;
     }
 
-    if (values.bookType === "audio" && !values.audioFile?.length) {
+    if (bookType === "audio" && !values.audioFile?.length) {
       alert("Audio file is required");
       return;
     }
@@ -120,15 +112,14 @@ const CreateBook = () => {
     formData.append("authorName", values.authorName);
     formData.append("genre", finalGenre);
     formData.append("description", values.description);
-    formData.append("bookType", values.bookType);
-
+    formData.append("bookType", bookType);
     formData.append("coverImage", values.coverImage[0]);
 
-    if (values.bookType === "pdf") {
+    if (bookType === "pdf") {
       formData.append("file", values.file![0]);
     }
 
-    if (values.bookType === "audio") {
+    if (bookType === "audio") {
       formData.append("audioFile", values.audioFile![0]);
       formData.append("duration", values.duration || "");
     }
@@ -184,9 +175,7 @@ const CreateBook = () => {
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Create a new book</CardTitle>
-              <CardDescription>
-                Add PDF or Audio books
-              </CardDescription>
+              <CardDescription>Add PDF or Audio books</CardDescription>
             </CardHeader>
 
             <CardContent className="grid gap-6">
@@ -267,7 +256,7 @@ const CreateBook = () => {
                     <FormItem>
                       <FormLabel>Custom Category</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g. Audio Books" />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -290,7 +279,7 @@ const CreateBook = () => {
                 )}
               />
 
-              {/* COVER IMAGE */}
+              {/* COVER */}
               <FormField
                 control={form.control}
                 name="coverImage"
@@ -301,9 +290,7 @@ const CreateBook = () => {
                       <Input
                         type="file"
                         accept="image/*"
-                        onChange={(e) =>
-                          field.onChange(e.target.files)
-                        }
+                        onChange={(e) => field.onChange(e.target.files)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -311,7 +298,32 @@ const CreateBook = () => {
                 )}
               />
 
-              {/* PDF FILE */}
+              {/* PAID TOGGLE */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={isPaid}
+                  onChange={(e) => setIsPaid(e.target.checked)}
+                />
+                <span>Paid Book (Pro Library)</span>
+              </div>
+
+              {isPaid && (
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price (₹)</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* PDF */}
               {bookType === "pdf" && (
                 <FormField
                   control={form.control}
@@ -323,18 +335,15 @@ const CreateBook = () => {
                         <Input
                           type="file"
                           accept="application/pdf"
-                          onChange={(e) =>
-                            field.onChange(e.target.files)
-                          }
+                          onChange={(e) => field.onChange(e.target.files)}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
               )}
 
-              {/* AUDIO FILE */}
+              {/* AUDIO */}
               {bookType === "audio" && (
                 <>
                   <FormField
@@ -352,7 +361,6 @@ const CreateBook = () => {
                             }
                           />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -362,11 +370,10 @@ const CreateBook = () => {
                     name="duration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Duration (e.g. 4 hrs 20 mins)</FormLabel>
+                        <FormLabel>Duration</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />

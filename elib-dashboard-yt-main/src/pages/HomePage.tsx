@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
-  Heart, 
   MapPin, 
   Mail, 
   Facebook, 
@@ -10,8 +9,7 @@ import {
   X, 
   Phone, 
   CheckCircle, 
-  Star, 
-  CircleUser 
+  Star 
 } from "lucide-react"; 
 import RequestBookPage from "./RequestBookPage";
 import axios from "axios";
@@ -20,7 +18,6 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [openRequestModal, setOpenRequestModal] = useState(false);
   const [openContactModal, setOpenContactModal] = useState(false); 
-  const [wishlistCount, setWishlistCount] = useState(0);
   
   // 🧠 AI RECOMMENDATION
   const [recommendedBooks, setRecommendedBooks] = useState<any[]>([]);
@@ -34,17 +31,6 @@ const HomePage = () => {
     title: string;
     audioUrl: string;
   } | null>(null);
-
-  /* ================= WISHLIST LOGIC ================= */
-  useEffect(() => {
-    const updateCount = () => {
-      const savedWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-      setWishlistCount(savedWishlist.length);
-    };
-    updateCount();
-    window.addEventListener("storage", updateCount);
-    return () => window.removeEventListener("storage", updateCount);
-  }, []);
 
   /* ================= AI: FETCH RECOMMENDATIONS ================= */
   useEffect(() => {
