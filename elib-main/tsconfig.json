@@ -18,25 +18,18 @@
 
     /* ================= TYPE CHECKING ================= */
     "strict": true,
+
+    /* 🔥 RENDER FIX 🔥 */
     "skipLibCheck": true,
-
-    /* 🔥 MOST IMPORTANT FOR RENDER 🔥 */
-    "noEmitOnError": false,
-
-    /* ================= TYPES ================= */
-    "types": [
-      "node",
-      "express"
-    ]
+    "noEmitOnError": false
   },
 
-  /* ================= WHAT TO COMPILE ================= */
+  /* ================= FILES ================= */
   "include": [
     "src/**/*",
     "server.ts"
   ],
 
-  /* ================= WHAT TO IGNORE ================= */
   "exclude": [
     "node_modules",
     "dist"
