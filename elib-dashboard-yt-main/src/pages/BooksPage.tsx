@@ -65,8 +65,8 @@ interface Book {
   title?: string;
   genre?: string;
   coverImage: string;
-  file?: string;        // PDF
-  audioFile?: string;  // AUDIO
+  file?: string;
+  audioFile?: string;
   duration?: string;
   bookType?: "pdf" | "audio";
   authorName?: string;
@@ -90,7 +90,10 @@ const BooksPage = () => {
   const [search, setSearch] = useState("");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
-  /* 🔓 UNLOCKED BOOKS (READ ONLY – no setter needed) */
+  /* ✅ AI RECOMMENDATION STATE (USED – NO TS ERROR) */
+  const [similarBooks, setSimilarBooks] = useState<Book[]>([]);
+
+  /* 🔓 UNLOCKED BOOKS */
   const [unlockedBooks] = useState<string[]>(() =>
     JSON.parse(localStorage.getItem("unlockedBooks") || "[]")
   );
@@ -109,6 +112,23 @@ const BooksPage = () => {
     const searchTerm = searchParams.get("search");
     if (searchTerm) setSearch(searchTerm);
   }, [searchParams]);
+
+  /* ================= AI SIMILAR BOOKS LOGIC ================= */
+  useEffect(() => {
+    if (!selectedBook) {
+      setSimilarBooks([]);
+      return;
+    }
+
+    const related = books.filter(
+      (b) =>
+        b._id !== selectedBook._id &&
+        normalizeCategory(b.genre) ===
+          normalizeCategory(selectedBook.genre)
+    );
+
+    setSimilarBooks(related.slice(0, 4));
+  }, [selectedBook, books]);
 
   /* ================= CATEGORIES ================= */
   const categories = useMemo(() => {
@@ -142,7 +162,6 @@ const BooksPage = () => {
     },
   });
 
-  /* ================= UNLOCK CHECK ================= */
   const isUnlocked = (book: Book) =>
     !book.isPaid || unlockedBooks.includes(book._id);
 
@@ -165,11 +184,11 @@ const BooksPage = () => {
                 <>
                   <audio
                     controls
-                    className="w-full mt-6"
+                    className="w-full mt-4"
                     src={selectedBook.audioFile}
                   />
                   {selectedBook.duration && (
-                    <p className="mt-2 text-sm text-slate-500">
+                    <p className="mt-2 text-sm text-muted-foreground">
                       Duration: {selectedBook.duration}
                     </p>
                   )}
@@ -195,6 +214,36 @@ const BooksPage = () => {
                 </>
               )}
             </>
+          )}
+
+          {/* 🤖 AI BASED RECOMMENDATION */}
+          {similarBooks.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-3">
+                🤖 Recommended Books
+              </h3>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {similarBooks.map((b) => (
+                  <Card
+                    key={b._id}
+                    className="cursor-pointer hover:shadow"
+                    onClick={() => setSelectedBook(b)}
+                  >
+                    <img
+                      src={b.coverImage}
+                      className="h-36 w-full object-cover rounded-t"
+                    />
+                    <CardContent className="p-2">
+                      <p className="text-sm font-medium">{b.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {b.authorName}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
