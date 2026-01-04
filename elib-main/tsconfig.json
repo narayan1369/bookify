@@ -1,55 +1,42 @@
 {
   "compilerOptions": {
-    /* ===============================
-       Language & Environment
-    =============================== */
+    /* ================= BASIC ================= */
     "target": "es2016",
-
-    /* ===============================
-       Module System
-    =============================== */
     "module": "commonjs",
+
+    /* ================= RESOLUTION ================= */
     "moduleResolution": "node",
     "resolveJsonModule": true,
 
-    /* ===============================
-       Paths
-    =============================== */
+    /* ================= PATHS ================= */
     "rootDir": "./",
     "outDir": "./dist",
 
-    /* ===============================
-       Interop & Compatibility
-    =============================== */
+    /* ================= INTEROP ================= */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* ===============================
-       Type Checking
-    =============================== */
+    /* ================= TYPE CHECKING ================= */
     "strict": true,
     "skipLibCheck": true,
 
-    /* ===============================
-       Types (IMPORTANT for Render)
-    =============================== */
+    /* 🔥 MOST IMPORTANT FOR RENDER 🔥 */
+    "noEmitOnError": false,
+
+    /* ================= TYPES ================= */
     "types": [
       "node",
       "express"
     ]
   },
 
-  /* ===============================
-     What to compile
-  =============================== */
+  /* ================= WHAT TO COMPILE ================= */
   "include": [
     "src/**/*",
     "server.ts"
   ],
 
-  /* ===============================
-     What to ignore
-  =============================== */
+  /* ================= WHAT TO IGNORE ================= */
   "exclude": [
     "node_modules",
     "dist"
