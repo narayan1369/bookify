@@ -1,28 +1,16 @@
 {
   "compilerOptions": {
-    /* Language */
     "target": "es2016",
-
-    /* Modules */
     "module": "commonjs",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-
-    /* Paths */
     "rootDir": "./",
     "outDir": "./dist",
 
-    /* Interop */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Type Checking */
     "strict": true,
-
-    /* IMPORTANT FOR RENDER */
     "skipLibCheck": true
-
-    /* ❌ DO NOT ADD "types": [] HERE */
   },
 
   "include": [
