@@ -1,30 +1,30 @@
 {
   "compilerOptions": {
-    /* ================= BASIC ================= */
+    /* Language */
     "target": "es2016",
-    "module": "commonjs",
 
-    /* ================= RESOLUTION ================= */
+    /* Modules */
+    "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
 
-    /* ================= PATHS ================= */
+    /* Paths */
     "rootDir": "./",
     "outDir": "./dist",
 
-    /* ================= INTEROP ================= */
+    /* Interop */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* ================= TYPE CHECKING ================= */
+    /* Type Checking */
     "strict": true,
 
-    /* 🔥 RENDER FIX 🔥 */
-    "skipLibCheck": true,
-    "noEmitOnError": false
+    /* IMPORTANT FOR RENDER */
+    "skipLibCheck": true
+
+    /* ❌ DO NOT ADD "types": [] HERE */
   },
 
-  /* ================= FILES ================= */
   "include": [
     "src/**/*",
     "server.ts"
