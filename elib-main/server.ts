@@ -1,16 +1,26 @@
 import app from "./src/app";
-import { config } from "./src/config/config";
 import connectDB from "./src/config/db";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const startServer = async () => {
-  // Connect database
-  await connectDB();
-  const port = config.port || 5000;
+  try {
+    console.log("🚀 Server starting...");
+    
+    // Connect MongoDB Atlas
+    await connectDB();
 
-  app.listen(port, () => {
-    console.log(`Listening on port: ${port}`);
-  });
-  
+    const PORT = process.env.PORT || 7001;
+
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on port ${PORT}`);
+    });
+
+  } catch (error) {
+    console.error("❌ Server failed to start:", error);
+    process.exit(1);
+  }
 };
 
 startServer();

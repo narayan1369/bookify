@@ -1,19 +1,20 @@
 import mongoose from "mongoose";
-import { config } from "./config";
 
 const connectDB = async () => {
   try {
-    mongoose.connection.on("connected", () => {
-      console.log("Connected to database successfully");
-    });
+    console.log("Connecting to MongoDB Atlas...");
 
-    mongoose.connection.on("error", (err) => {
-      console.log("Error in connecting to database.", err);
-    });
+    const uri = process.env.MONGODB_URI;
 
-    await mongoose.connect(config.databaseUrl as string);
-  } catch (err) {
-    console.error("Failed to connect to database.", err);
+    if (!uri) {
+      throw new Error("MONGODB_URI not found in .env");
+    }
+
+    await mongoose.connect(uri);
+
+    console.log("✅ Connected to MongoDB Atlas");
+  } catch (error) {
+    console.log("❌ MongoDB connection error:", error);
     process.exit(1);
   }
 };

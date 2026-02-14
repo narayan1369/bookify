@@ -4,38 +4,41 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 import userRouter from "./user/userRouter";
 import bookRouter from "./book/bookRouter";
 import adminRouter from "./admin/adminRouter";
-import requestBookRouter from "./routes/requestBook.routes"; // ✅ ADD
-import { config } from "./config/config";
+import requestBookRouter from "./routes/requestBook.routes";
 
 const app = express();
 
+/* ======================
+   CORS (FIXED)
+====================== */
 app.use(
   cors({
-    origin: config.frontendDomain,
+    origin: [
+      "http://localhost:5173",        // Vite local
+      "http://localhost:3000",        // React (optional)
+      "https://bookify.vercel.app"    // future Vercel
+    ],
+    credentials: true,
   })
 );
 
 app.use(express.json());
 
-// ======================
-// ROUTES
-// ======================
+/* ======================
+   ROUTES
+====================== */
 app.get("/", (_req: Request, res: Response) => {
-  res.json({ message: "Welcome to elib APIs" });
+  res.json({ message: "Welcome to Bookify APIs 🚀" });
 });
 
 app.use("/api/users", userRouter);
 app.use("/api/books", bookRouter);
-
-// 🔐 ADMIN ROUTES
 app.use("/api/admin", adminRouter);
+app.use("/api", requestBookRouter);
 
-// 📩 REQUEST BOOK ROUTE
-app.use("/api", requestBookRouter); // ✅ FIXED
-
-// ======================
-// GLOBAL ERROR HANDLER
-// ======================
+/* ======================
+   ERROR HANDLER
+====================== */
 app.use(globalErrorHandler);
 
 export default app;
