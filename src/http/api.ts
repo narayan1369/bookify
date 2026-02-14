@@ -6,22 +6,21 @@ import useTokenStore from "@/store";
 ========================= */
 const api = axios.create({
   baseURL:
-    import.meta.env.VITE_PUBLIC_BACKEND_URL || "http://localhost:7001",
+    import.meta.env.VITE_PUBLIC_BACKEND_URL ||
+    "https://bookify-zckw.onrender.com",
 });
 
 /* =========================
-   ATTACH JWT TOKEN (FIXED 🔥)
+   TOKEN ATTACH
 ========================= */
 api.interceptors.request.use((config) => {
   let token = useTokenStore.getState().token;
 
-  // 🛟 fallback if zustand not hydrated (page refresh)
   if (!token) {
-    const stored = localStorage.getItem("auth-store"); // ✅ correct key
+    const stored = localStorage.getItem("auth-store");
     if (stored) {
       try {
-        const parsed = JSON.parse(stored);
-        token = parsed?.state?.token;
+        token = JSON.parse(stored)?.state?.token;
       } catch {}
     }
   }
@@ -42,101 +41,43 @@ api.interceptors.request.use((config) => {
 export const login = (data: {
   email: string;
   password: string;
-}) => {
-  return api.post("/api/users/login", data);
-};
+}) => api.post("/api/auth/login", data);
 
 export const register = (data: {
   name: string;
   email: string;
   password: string;
-}) => {
-  return api.post("/api/users/register", data);
-};
+}) => api.post("/api/auth/register", data);
 
 /* =========================
    BOOK APIs
 ========================= */
-export const getBooks = () => {
-  return api.get("/api/books");
-};
+export const getBooks = () => api.get("/api/books");
 
-export const getSingleBook = (bookId: string) => {
-  return api.get(`/api/books/${bookId}`);
-};
+export const getSingleBook = (bookId: string) =>
+  api.get(`/api/books/${bookId}`);
 
-export const createBook = (data: FormData) => {
-  return api.post("/api/books", data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+export const createBook = (data: FormData) =>
+  api.post("/api/books", data, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
-};
 
 /* =========================
-   ⭐ CATEGORIES (DERIVED)
+   WISHLIST
 ========================= */
-export const getCategories = async (): Promise<string[]> => {
-  const res = await api.get("/api/books");
-  const books = res.data || [];
+export const addToWishlist = (bookId: string) =>
+  api.post(`/api/auth/wishlist/${bookId}`);
 
-  return Array.from(
-    new Set(
-      books
-        .map((b: any) => b.genre)
-        .filter(Boolean)
-        .map((c: string) => c.trim())
-    )
-  );
-};
+export const removeFromWishlist = (bookId: string) =>
+  api.delete(`/api/auth/wishlist/${bookId}`);
+
+export const getWishlist = () =>
+  api.get("/api/auth/wishlist");
 
 /* =========================
-   ⭐ REVIEWS & RATINGS
+   REQUEST BOOK
 ========================= */
-export const addReview = (
-  bookId: string,
-  data: { rating: number; comment?: string }
-) => {
-  return api.post(`/api/books/${bookId}/reviews`, data);
-};
-
-/* =========================
-   🤖 AI RECOMMENDATIONS
-========================= */
-export const getSimilarBooks = (bookId: string) => {
-  return api.get(`/api/books/${bookId}/similar`);
-};
-
-export const getRecommendedBooks = () => {
-  return api.get(`/api/books/recommendations/me`);
-};
-
-/* =========================
-   ❤️ WISHLIST
-========================= */
-export const addToWishlist = (bookId: string) => {
-  return api.post(`/api/users/wishlist/${bookId}`);
-};
-
-export const removeFromWishlist = (bookId: string) => {
-  return api.delete(`/api/users/wishlist/${bookId}`);
-};
-
-export const getWishlist = () => {
-  return api.get("/api/users/wishlist");
-};
-
-/* =========================
-   📩 REQUEST A BOOK
-========================= */
-export const requestBook = (data: {
-  bookName: string;
-  authorName: string;
-  category: string;
-  userEmail: string;
-  message?: string;
-}) => {
-  return api.post("/api/request-book", data);
-};
+export const requestBook = (data: any) =>
+  api.post("/api/request-book", data);
 
 export default api;

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import express, { Request, Response, NextFunction } from "express";
+=======
+import express from "express";
+>>>>>>> 063aaa9 (update api)
 import cors from "cors";
 
 import userRouter from "./user/userRouter";
@@ -9,6 +13,7 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 const app = express();
 
+<<<<<<< HEAD
 /* ===========================
    CORS CONFIG (VERY IMPORTANT)
 =========================== */
@@ -23,6 +28,15 @@ app.use(
     credentials: true,
   })
 );
+=======
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://bookify-3bnu.vercel.app"
+  ],
+  credentials: true,
+}));
+>>>>>>> 063aaa9 (update api)
 
 /* ===========================
    BODY PARSER
@@ -30,6 +44,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+<<<<<<< HEAD
 /* ===========================
    HEALTH CHECK
 =========================== */
@@ -45,6 +60,16 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api/auth", userRouter);
 
 // BOOK ROUTES
+=======
+app.get("/", (_req, res) => {
+  res.json({ message: "Welcome to Bookify APIs 🚀" });
+});
+
+/* ✅ AUTH ROUTES */
+app.use("/api/auth", userRouter);
+
+/* OTHER ROUTES */
+>>>>>>> 063aaa9 (update api)
 app.use("/api/books", bookRouter);
 
 // ADMIN ROUTES
@@ -53,6 +78,7 @@ app.use("/api/admin", adminRouter);
 // REQUEST BOOK ROUTES
 app.use("/api", requestBookRouter);
 
+<<<<<<< HEAD
 /* ===========================
    404 HANDLER
 =========================== */
@@ -68,4 +94,6 @@ app.use((req: Request, res: Response) => {
 =========================== */
 app.use(globalErrorHandler);
 
+=======
+>>>>>>> 063aaa9 (update api)
 export default app;
