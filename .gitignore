@@ -1,44 +1,38 @@
 # dependencies
 node_modules/
 
-# production
+# production build
 dist/
 build/
+dist-ssr/
 
 # env files
 .env
 .env.local
+*.local
 
 # logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
 # editor
 .vscode/
 .idea/
-# node / react
-node_modules/
-dist/
-build/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# env
-.env
-.env.local
-
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# OS
-.DS_Store
-Thumbs.db
-
-# editor
-.vscode/
-.idea/
+# misc
+coverage/
+tmp/
+.cache/
