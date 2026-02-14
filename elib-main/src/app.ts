@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import express, { Request, Response, NextFunction } from "express";
-=======
-import express from "express";
->>>>>>> 063aaa9 (update api)
+import express, { Request, Response } from "express";
 import cors from "cors";
 
 import userRouter from "./user/userRouter";
@@ -13,9 +9,8 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 const app = express();
 
-<<<<<<< HEAD
 /* ===========================
-   CORS CONFIG (VERY IMPORTANT)
+   CORS CONFIG
 =========================== */
 app.use(
   cors({
@@ -28,15 +23,6 @@ app.use(
     credentials: true,
   })
 );
-=======
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://bookify-3bnu.vercel.app"
-  ],
-  credentials: true,
-}));
->>>>>>> 063aaa9 (update api)
 
 /* ===========================
    BODY PARSER
@@ -44,45 +30,25 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-<<<<<<< HEAD
 /* ===========================
    HEALTH CHECK
 =========================== */
 app.get("/", (_req: Request, res: Response) => {
-  res.json({ message: "Welcome to Bookify APIs 🚀" });
+  res.json({ message: "Bookify API running 🚀" });
 });
 
 /* ===========================
    ROUTES
 =========================== */
-
-// AUTH ROUTES
 app.use("/api/auth", userRouter);
-
-// BOOK ROUTES
-=======
-app.get("/", (_req, res) => {
-  res.json({ message: "Welcome to Bookify APIs 🚀" });
-});
-
-/* ✅ AUTH ROUTES */
-app.use("/api/auth", userRouter);
-
-/* OTHER ROUTES */
->>>>>>> 063aaa9 (update api)
 app.use("/api/books", bookRouter);
-
-// ADMIN ROUTES
 app.use("/api/admin", adminRouter);
-
-// REQUEST BOOK ROUTES
 app.use("/api", requestBookRouter);
 
-<<<<<<< HEAD
 /* ===========================
-   404 HANDLER
+   404
 =========================== */
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: "API Route Not Found",
@@ -90,10 +56,8 @@ app.use((req: Request, res: Response) => {
 });
 
 /* ===========================
-   GLOBAL ERROR HANDLER
+   ERROR HANDLER
 =========================== */
 app.use(globalErrorHandler);
 
-=======
->>>>>>> 063aaa9 (update api)
 export default app;
