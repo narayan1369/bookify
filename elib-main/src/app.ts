@@ -9,45 +9,31 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 const app = express();
 
-/* ===========================
-   CORS CONFIG
-=========================== */
+/* CORS */
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "http://localhost:3000",
-      "https://bookify-3bnu.vercel.app",
-      "https://bookify.vercel.app",
+      "https://bookify-3bnu.vercel.app"
     ],
     credentials: true,
   })
 );
 
-/* ===========================
-   BODY PARSER
-=========================== */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ===========================
-   HEALTH CHECK
-=========================== */
 app.get("/", (_req: Request, res: Response) => {
   res.json({ message: "Bookify API running 🚀" });
 });
 
-/* ===========================
-   ROUTES
-=========================== */
+/* ROUTES */
 app.use("/api/auth", userRouter);
 app.use("/api/books", bookRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api", requestBookRouter);
 
-/* ===========================
-   404
-=========================== */
+/* 404 */
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
@@ -55,9 +41,6 @@ app.use((_req: Request, res: Response) => {
   });
 });
 
-/* ===========================
-   ERROR HANDLER
-=========================== */
 app.use(globalErrorHandler);
 
 export default app;
