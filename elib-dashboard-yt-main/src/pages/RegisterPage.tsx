@@ -26,14 +26,17 @@ const RegisterPage = () => {
 
   const mutation = useMutation({
     mutationFn: register,
+
     onSuccess: (res) => {
-      const { accessToken } = res.data;
+      const { accessToken, user } = res.data;
 
-      // ✅ Save token (user will be fetched after login)
-      setAuth(accessToken, null as any);
+      // ✅ Save token + user
+      setAuth(accessToken, user);
 
+      // ✅ Redirect after register
       navigate("/dashboard/home", { replace: true });
     },
+
     onError: (error) => {
       console.error("Registration error", error);
     },
